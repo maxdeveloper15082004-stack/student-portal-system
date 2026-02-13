@@ -8,7 +8,11 @@ __pycache__/
 *.log
 local_settings.py
 db.sqlite3
-media
+db.sqlite3-journal
+staticfiles/
+
+# Media uploads
+media/
 
 # Virtual Env
 .venv/
@@ -18,3 +22,10 @@ env/
 # IDE
 .vscode/
 .idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env

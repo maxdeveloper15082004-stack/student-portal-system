@@ -9,7 +9,7 @@ SECRET_KEY = "django-insecure-ru(3hjvjgv2+f@e3=vvgmjk@*w)(cs2&%opko#fyf4_u-+0j*z
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -91,9 +91,8 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 MEDIA_URL = "media/"
