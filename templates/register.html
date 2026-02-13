@@ -1,0 +1,344 @@
+{% extends 'base.html' %} {% block content %}
+<style>
+  .register-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .register-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .register-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .register-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: #ffffff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .register-title {
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .register-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+    max-width: 340px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .section-divider {
+    grid-column: 1 / -1;
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0.5rem 0 1rem;
+  }
+
+  .error-message {
+    color: #ef4444;
+    text-align: center;
+    margin-bottom: 1rem;
+    min-height: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .register-btn {
+    margin-top: 0.5rem;
+    max-width: 340px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .register-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .register-footer span {
+    color: var(--text-muted);
+  }
+
+  .register-footer a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .register-footer a:hover {
+    color: var(--primary-hover);
+  }
+
+  select option {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .form-group.full-width {
+      max-width: 100%;
+    }
+    .register-btn {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="8.5" cy="7" r="4"></circle>
+        <line x1="20" y1="8" x2="20" y2="14"></line>
+        <line x1="23" y1="11" x2="17" y2="11"></line>
+      </svg>
+    </div>
+
+    <h2 class="register-title">Create Account</h2>
+    <p class="register-subtitle">Register for the student portal</p>
+
+    <div id="error-msg" class="error-message"></div>
+
+    <form id="register-form">
+      {% csrf_token %}
+
+      <div class="form-grid">
+        <!-- Role & Username -->
+        <div class="form-group">
+          <label for="role-select">Role</label>
+          <select name="role" id="role-select">
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-username">Username</label>
+          <input
+            type="text"
+            id="reg-username"
+            name="username"
+            placeholder="Enter username"
+            required
+            autocomplete="off"
+          />
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Student-specific fields -->
+        <div id="student-fields" style="display: contents">
+          <div class="form-group">
+            <label for="reg-number">Register ID No.</label>
+            <input
+              type="text"
+              id="reg-number"
+              name="register_number"
+              placeholder="Enter register number"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="reg-email-student">Email Address</label>
+            <input
+              type="email"
+              id="reg-email-student"
+              name="email"
+              placeholder="Enter email address"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="reg-year">Year</label>
+            <select id="reg-year" name="std_class">
+              <option value="" disabled selected>Select Year</option>
+              <option value="First Year">First Year</option>
+              <option value="Second Year">Second Year</option>
+              <option value="Third Year">Third Year</option>
+              <option value="Final Year">Final Year</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-section">Section</label>
+            <select id="reg-section" name="section">
+              <option value="" disabled selected>Select Section</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Admin-specific fields -->
+        <div id="admin-fields" style="display: none">
+          <div class="form-group" style="margin-bottom: 1rem">
+            <label for="admin-year">Managed Year</label>
+            <select id="admin-year" name="std_class">
+              <option value="" disabled selected>Select Year</option>
+              <option value="First Year">First Year</option>
+              <option value="Second Year">Second Year</option>
+              <option value="Third Year">Third Year</option>
+              <option value="Final Year">Final Year</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem">
+            <label for="admin-section">Managed Section</label>
+            <select id="admin-section" name="section">
+              <option value="" disabled selected>Select Section</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-email">Email Address</label>
+            <input
+              type="email"
+              id="admin-email"
+              name="email"
+              placeholder="Enter email address"
+            />
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Password -->
+        <div class="form-group full-width">
+          <label for="reg-password">Password</label>
+          <input
+            type="password"
+            id="reg-password"
+            name="password"
+            placeholder="Create a password"
+            required
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="register-btn">Sign Up</button>
+
+      <div class="register-footer">
+        <span>Already have an account?</span>
+        <a href="/login/">Login</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const roleSelect = document.getElementById("role-select");
+  const studentFields = document.getElementById("student-fields");
+  const adminFields = document.getElementById("admin-fields");
+
+  function setInputsState(container, isEnabled) {
+    container.style.display = isEnabled ? "contents" : "none";
+    container.querySelectorAll("input, select").forEach((el) => {
+      el.required = isEnabled;
+      el.disabled = !isEnabled;
+    });
+  }
+
+  roleSelect.addEventListener("change", function () {
+    if (this.value === "admin") {
+      setInputsState(studentFields, false);
+      setInputsState(adminFields, true);
+    } else {
+      setInputsState(studentFields, true);
+      setInputsState(adminFields, false);
+    }
+  });
+
+  roleSelect.dispatchEvent(new Event("change"));
+
+  document
+    .getElementById("register-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      delete data.csrfmiddlewaretoken;
+
+      const msg = document.getElementById("error-msg");
+      msg.textContent = "";
+
+      const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+      const token = csrfInput ? csrfInput.value : "";
+
+      try {
+        const res = await fetch("/api/register/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": token,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+          window.location.href = "/login/";
+        } else {
+          const err = await res.json();
+
+          let errorText = "Registration failed.";
+          if (typeof err === "object") {
+            errorText = Object.values(err).flat().join(" ");
+          }
+          msg.textContent = errorText || "Registration failed";
+        }
+      } catch (err) {
+        msg.textContent = "An error occurred.";
+      }
+    });
+</script>
+
+{% endblock %}

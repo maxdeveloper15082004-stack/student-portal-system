@@ -1,0 +1,204 @@
+{% extends 'base.html' %} {% block content %}
+<style>
+  .login-container {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .login-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .login-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: #ffffff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .login-title {
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .login-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+
+  .field-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: -0.5rem;
+    margin-bottom: 0.75rem;
+    padding-left: 0.25rem;
+    display: none;
+  }
+
+  .input-error {
+    border-color: #ef4444 !important;
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .login-footer span {
+    color: var(--text-muted);
+  }
+
+  .login-footer a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .login-footer a:hover {
+    color: var(--primary-hover);
+  }
+</style>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+
+    <h2 class="login-title">Welcome Back</h2>
+    <p class="login-subtitle">Sign in to your student portal</p>
+
+    <form id="login-form">
+      {% csrf_token %}
+
+      <label for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Enter your username"
+        required
+        autocomplete="off"
+      />
+      <div id="username-error" class="field-error"></div>
+
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Enter your password"
+        required
+      />
+      <div id="password-error" class="field-error"></div>
+
+      <button type="submit" style="margin-top: 0.5rem">Login</button>
+
+      <div class="login-footer">
+        <span>Don't have an account?</span>
+        <a href="/register/">Register Now</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function clearErrors() {
+    document.getElementById("username-error").style.display = "none";
+    document.getElementById("username-error").textContent = "";
+    document.getElementById("password-error").style.display = "none";
+    document.getElementById("password-error").textContent = "";
+    document.getElementById("username").classList.remove("input-error");
+    document.getElementById("password").classList.remove("input-error");
+  }
+
+  function showFieldError(field, message) {
+    const errorEl = document.getElementById(field + "-error");
+    const inputEl = document.getElementById(field);
+    errorEl.textContent = message;
+    errorEl.style.display = "block";
+    inputEl.classList.add("input-error");
+    inputEl.focus();
+  }
+
+  // Clear errors when user starts typing
+  document.getElementById("username").addEventListener("input", () => {
+    document.getElementById("username-error").style.display = "none";
+    document.getElementById("username").classList.remove("input-error");
+  });
+  document.getElementById("password").addEventListener("input", () => {
+    document.getElementById("password-error").style.display = "none";
+    document.getElementById("password").classList.remove("input-error");
+  });
+
+  document
+    .getElementById("login-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      delete data.csrfmiddlewaretoken;
+
+      clearErrors();
+
+      const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+      const token = csrfInput ? csrfInput.value : "";
+
+      try {
+        const res = await fetch("/api/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": token,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+          window.location.href = "/dashboard/";
+        } else {
+          const err = await res.json();
+
+          if (err.username) {
+            showFieldError("username", err.username);
+          } else if (err.password) {
+            showFieldError("password", err.password);
+          } else {
+            showFieldError("username", "Invalid credentials");
+          }
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        showFieldError("username", "An error occurred. Please try again.");
+      }
+    });
+</script>
+{% endblock %}
